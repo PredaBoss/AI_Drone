@@ -1,8 +1,8 @@
 import numpy as np
 import pygame
 
-from Model.Colors import Colors
-from Model.Directions import Directions
+from Constants.Colors import Colors
+from Constants.Directions import Directions
 
 
 class DMap():

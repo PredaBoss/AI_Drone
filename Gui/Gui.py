@@ -2,11 +2,10 @@ from random import randint
 
 import pygame
 import time
-from pygame.constants import KEYDOWN
 
-from Model.Colors import Colors
-from Model.DMap import DMap
-from Controller.Drone import Drone
+from Constants.Colors import Colors
+from Board.DMap import DMap
+from Drone.Drone import Drone
 
 
 class Gui:

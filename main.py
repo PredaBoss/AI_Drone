@@ -1,5 +1,5 @@
-from Model.Environment import Environment
-from View.Gui import Gui
+from Board.Environment import Environment
+from Gui.Gui import Gui
 
 if __name__ == '__main__':
     environment = Environment()

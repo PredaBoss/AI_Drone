@@ -4,8 +4,8 @@ from random import random
 import numpy as np
 import pygame
 
-from Model.Colors import Colors
-from Model.Directions import Directions
+from Constants.Colors import Colors
+from Constants.Directions import Directions
 
 class Environment:
     def __init__(self):
@@ -18,14 +18,6 @@ class Environment:
             for j in range(self.__m):
                 if random() <= fill:
                     self.__surface[i][j] = 1
-
-    def __str__(self):
-        string = ""
-        for i in range(self.__n):
-            for j in range(self.__m):
-                string = string + str(int(self.__surface[i][j]))
-            string = string + "\n"
-        return string
 
     def readUDMSensors(self, x, y):
         readings = [0, 0, 0, 0]
@@ -76,3 +68,11 @@ class Environment:
                     imagine.blit(brick, (j * 20, i * 20))
 
         return imagine
+
+    def __str__(self):
+        string = ""
+        for i in range(self.__n):
+            for j in range(self.__m):
+                string = string + str(int(self.__surface[i][j]))
+            string = string + "\n"
+        return string

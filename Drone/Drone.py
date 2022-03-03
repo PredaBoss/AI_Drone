@@ -15,8 +15,6 @@ class Drone():
         self.dy = [0,0,1,-1]
 
     def add_in_stk(self, detectedMap):
-        print(self.x)
-        print(self.y)
         for i in range(4):
             if self.x + self.dx[i] >= 0 and self.x + self.dx[i] <= 19 and self.y + self.dy[i] >= 0 and self.y + self.dy[i] <= 19:
                 if (not self.added.__contains__((self.x + self.dx[i],self.y + self.dy[i]))) and detectedMap.surface[self.x + self.dx[i]][self.y + self.dy[i]] == 0:
@@ -42,6 +40,8 @@ class Drone():
     def moveDSF(self, detectedMap):
         self.add_in_stk(detectedMap)
         if len(self.stk) == 0:
+            self.x = None
+            self.y = None
             return -1
         nxt = self.stk.pop()
         self.x = nxt[0]
