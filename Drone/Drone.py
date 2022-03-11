@@ -23,14 +23,16 @@ class Drone():
         used_in_has_unvisited.add((x,y))
 
         for i in range(4):
-            if not self.used_in_has_unvisited.__contains__((x + self.dx[i], y + self.dy[i])):
-                if x + self.dx[i] >= 0 and x + self.dx[i] <= 19 and y + self.dy[i] >= 0 and y + self.dy[i] <= 19:
-                    if (not self.added.__contains__((x + self.dx[i],y + self.dy[i]))):
-                        if detectedMap.surface[x + self.dx[i]][y + self.dy[i]] == -1:
+            next_x = x + self.dx[i]
+            next_y = y + self.dy[i]
+            if not self.used_in_has_unvisited.__contains__((next_x, next_y)):
+                if next_x >= 0 and next_x <= 19 and next_y >= 0 and next_y <= 19:
+                    if (not self.added.__contains__((next_x,next_y))):
+                        if detectedMap.surface[next_x][next_y] == -1:
                             return True
-                        if detectedMap.surface[x + self.dx[i]][y + self.dy[i]] == 0:
-                            if not used_in_has_unvisited.__contains__((x + self.dx[i],y + self.dy[i])):
-                                if self.has_unvisited(x + self.dx[i],y + self.dy[i],detectedMap,used_in_has_unvisited):
+                        if detectedMap.surface[next_x][next_y] == 0:
+                            if not used_in_has_unvisited.__contains__((next_x,next_y)):
+                                if self.has_unvisited(next_x,next_y,detectedMap,used_in_has_unvisited):
                                     return True
         return False
 
