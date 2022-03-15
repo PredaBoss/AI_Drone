@@ -6,6 +6,7 @@ import time
 from Constants.Colors import Colors
 from Board.Map import Map
 from Drone.Drone import Drone
+from Service.Service import Service
 
 
 class Gui:
@@ -17,6 +18,7 @@ class Gui:
 
         # we position the drone somewhere in the area
         self.d = Drone(randint(0, 19), randint(0, 19))
+        self.service = Service()
 
 
     def start_game(self):
@@ -78,6 +80,9 @@ class Gui:
         # define a variable to control the main loop
         running = True
         counter = 0
+        chosenDestination = None
+        time.sleep(0.3)
+        pygame.event.clear()
         # main loop
         while running:
             # event handling, gets all event from the event queue
@@ -87,39 +92,38 @@ class Gui:
                     # change the value to False, to exit the main loop
                     running = False
                     break
-                if event.type == pygame.KEYDOWN:
+                if event.type == pygame.MOUSEBUTTONUP:
+                    pos = pygame.mouse.get_pos()
+                    chosenDestination = self.service.verify_pos(pos)
+                    if chosenDestination is None:
+                        continue
                     running = False
+                    break
 
             screen.blit(self.d.mapWithDrone(self.m.image()), (0, 0))
             pygame.display.flip()
 
-        path = self.dummysearch()
-        screen.blit(self.displayWithPath(self.m.image(), path), (0, 0))
+        start_time = time.time()
+        path = self.service.searchGreedy(self.m,self.d,self.d.x,self.d.y,chosenDestination[0],chosenDestination[1])
+        end_time = time.time()
+        print("Greedy:",end_time-start_time)
+        screen.blit(self.displayWithPath(self.m.image(), path, Colors.GREEN.value), (0, 0))
+        pygame.display.flip()
+        time.sleep(delay)
+
+        start_time = time.time()
+        path = self.service.searchAStar(self.m,self.d,self.d.x,self.d.y,chosenDestination[0],chosenDestination[1])
+        end_time = time.time()
+        print("A*:",end_time-start_time)
+        screen.blit(self.displayWithPath(self.m.image(), path, Colors.RED.value), (0, 0))
         pygame.display.flip()
         time.sleep(delay)
 
         pygame.quit()
 
-    def searchAStar(self,mapM, droneD, initialX, initialY, finalX, finalY):
-        # TO DO
-        # implement the search function and put it in controller
-        # returns a list of moves as a list of pairs [x,y]
-
-        pass
-
-    def searchGreedy(self,mapM, droneD, initialX, initialY, finalX, finalY):
-        # TO DO
-        # implement the search function and put it in controller
-        # returns a list of moves as a list of pairs [x,y]
-        pass
-
-    def dummysearch(self):
-        # example of some path in test1.map from [5,7] to [7,11]
-        return [[5, 7], [5, 8], [5, 9], [5, 10], [5, 11], [6, 11], [7, 11]]
-
-    def displayWithPath(self,image, path):
+    def displayWithPath(self,image, path, colour):
         mark = pygame.Surface((20, 20))
-        mark.fill(Colors.GREEN.value)
+        mark.fill(colour)
         for move in path:
             image.blit(mark, (move[1] * 20, move[0] * 20))
 
