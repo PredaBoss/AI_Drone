@@ -4,18 +4,16 @@ import pygame
 import time
 
 from Constants.Colors import Colors
-from Board.DMap import DMap
+from Board.Map import Map
 from Drone.Drone import Drone
 
 
 class Gui:
-    def __init__(self,environment):
-        # we create the environment
-        self.e = environment
-        # print(str(e))
+    def __init__(self, map):
 
         # we create the map
-        self.m = DMap()
+        self.m = map
+        self.m.loadMap("test1.map")
 
         # we position the drone somewhere in the area
         self.d = Drone(randint(0, 19), randint(0, 19))
@@ -35,9 +33,9 @@ class Gui:
         height = start_screen.get_height()
 
         smallfont = pygame.font.SysFont('Corbel', 35)
-        text1 = smallfont.render('0.01', True, Colors.WHITE.value)
-        text2 = smallfont.render('0.10', True, Colors.WHITE.value)
-        text3 = smallfont.render('1.00', True, Colors.WHITE.value)
+        text1 = smallfont.render('1.00', True, Colors.WHITE.value)
+        text2 = smallfont.render('2.00', True, Colors.WHITE.value)
+        text3 = smallfont.render('5.00', True, Colors.WHITE.value)
 
         button_width = (width-40)//3
         button_height = height//3
@@ -61,24 +59,22 @@ class Gui:
                     return
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if 10 <= mouse[0] <= 10+button_width and height //4 <= mouse[1] <= height//4 + button_height:
-                        self.run_game(0.01)
+                        self.run_game(1.0)
                         return
                     if 20+button_width <= mouse[0] <= 20+2*button_width and height //4 <= mouse[1] <= height//4 + button_height:
-                        self.run_game(0.1)
+                        self.run_game(2.0)
                         return
                     if 30+button_width <= mouse[0] <= 30+3*button_width and height //4 <= mouse[1] <= height//4 + button_height:
-                        self.run_game(1.0)
+                        self.run_game(5.0)
                         return
 
     def run_game(self,delay):
-        pygame.display.set_caption("drone exploration")
+        pygame.display.set_caption("Path in simple environment")
 
         # create a surface on screen that has the size of 800 x 480
-        screen = pygame.display.set_mode((800, 400))
+        screen = pygame.display.set_mode((400, 400))
         screen.fill(Colors.WHITE.value)
-        screen.blit(self.e.image(), (0, 0))
 
-        self.m.markDetectedWalls(self.e, self.d.x, self.d.y)
         # define a variable to control the main loop
         running = True
         counter = 0
@@ -91,19 +87,43 @@ class Gui:
                     # change the value to False, to exit the main loop
                     running = False
                     break
+                if event.type == pygame.KEYDOWN:
+                    running = False
 
-            time.sleep(delay)
-            response = self.d.moveDSF(self.m)
-            if response == -1:
-                self.end_game(counter)
-                return
-            counter = counter+1
-
-            self.m.markDetectedWalls(self.e, self.d.x, self.d.y)
-            screen.blit(self.m.image(self.d.x, self.d.y), (400, 0))
+            screen.blit(self.d.mapWithDrone(self.m.image()), (0, 0))
             pygame.display.flip()
 
+        path = self.dummysearch()
+        screen.blit(self.displayWithPath(self.m.image(), path), (0, 0))
+        pygame.display.flip()
+        time.sleep(delay)
+
         pygame.quit()
+
+    def searchAStar(self,mapM, droneD, initialX, initialY, finalX, finalY):
+        # TO DO
+        # implement the search function and put it in controller
+        # returns a list of moves as a list of pairs [x,y]
+
+        pass
+
+    def searchGreedy(self,mapM, droneD, initialX, initialY, finalX, finalY):
+        # TO DO
+        # implement the search function and put it in controller
+        # returns a list of moves as a list of pairs [x,y]
+        pass
+
+    def dummysearch(self):
+        # example of some path in test1.map from [5,7] to [7,11]
+        return [[5, 7], [5, 8], [5, 9], [5, 10], [5, 11], [6, 11], [7, 11]]
+
+    def displayWithPath(self,image, path):
+        mark = pygame.Surface((20, 20))
+        mark.fill(Colors.GREEN.value)
+        for move in path:
+            image.blit(mark, (move[1] * 20, move[0] * 20))
+
+        return image
 
     def end_game(self, counter):
         time.sleep(1)
