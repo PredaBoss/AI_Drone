@@ -1,4 +1,6 @@
+import math
 import queue
+import random
 from math import sqrt
 
 
@@ -12,7 +14,7 @@ class Service:
             return None
         return (int(pos[1]/20),int(pos[0]/20))
 
-    def searchAStar(self,mapM, droneD, initialX, initialY, finalX, finalY):
+    def searchAStar(self,mapM, initialX, initialY, finalX, finalY):
         # TO DO
         # implement the search function and put it in controller
         # returns a list of moves as a list of pairs [x,y]
@@ -31,7 +33,7 @@ class Service:
         path.reverse()
         return path
 
-    def searchGreedy(self,mapM, droneD, initialX, initialY, finalX, finalY):
+    def searchGreedy(self,mapM, initialX, initialY, finalX, finalY):
         # TO DO
         # implement the search function and put it in controller
         # returns a list of moves as a list of pairs [x,y]
@@ -74,6 +76,35 @@ class Service:
                 toVisit.put((priorityFunction(child),child))
                 parent[child] = node
         return found, parent
+
+    def getSimulatedAnnealingAnswer(self,mapM, initialX, initialY, finalX, finalY):
+        start = (initialX,initialY)
+        end = (finalX,finalY)
+        return self.simulatedAnnealing(mapM, start, end, 1000, lambda current: self.euclideanDistance(current,  end))
+
+    def simulatedAnnealing(self, mapM, start, end, temperature, priorityFunction):
+        where = start
+        path = []
+        k = 0
+        while where != end:
+            path.append(where)
+            k = k+1
+            current_temperature = temperature / k
+
+            neighbours = self.getNeighbors(mapM, where)
+            neighbor = neighbours[random.randint(0,len(neighbours)-1)]
+            if priorityFunction(neighbor) < priorityFunction(where):
+                where = neighbor
+                continue
+
+            r = random.uniform(0,1)
+            probability = math.exp(-abs(priorityFunction(neighbor)-priorityFunction(where)) / current_temperature)
+            if r < probability:
+                where = neighbor
+
+        path.append(end)
+        return path
+
 
     def getNeighbors(self, mapM, node):
         neighbors = []
