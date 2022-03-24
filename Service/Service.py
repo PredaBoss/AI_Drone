@@ -20,7 +20,7 @@ class Service:
         # returns a list of moves as a list of pairs [x,y]
         start = (initialX, initialY)
         end = (finalX, finalY)
-        found, parent = self.bfs(mapM, start, end, lambda current: self.euclideanDistance(current, end) + self.euclideanDistance(start,current))
+        found, parent = self.bfs(mapM, start, end, lambda current,distances: self.euclideanDistance(current, end) + distances[current[0]][current[1]])
         if not found:
             return []
 
@@ -39,7 +39,7 @@ class Service:
         # returns a list of moves as a list of pairs [x,y]
         start = (initialX, initialY)
         end = (finalX,finalY)
-        found, parent = self.bfs(mapM,start,end,lambda current: self.euclideanDistance(current, end))
+        found, parent = self.bfs(mapM,start,end,lambda current,distances: self.euclideanDistance(current, end))
         if not found:
             return []
 
@@ -53,10 +53,15 @@ class Service:
         return path
 
     def bfs(self, mapM, start, end, priorityFunction):
+
+        inf = mapM.n + mapM.m
+        distances = [[inf for _ in range(mapM.m)] for _ in range(mapM.n) ]
+        distances[start[0]][start[1]] = 0
+
         found = False
         visited = set()
         toVisit = queue.PriorityQueue()
-        toVisit.put((priorityFunction(start), start))
+        toVisit.put((priorityFunction(start,distances), start))
         parent = {start: -1}
 
         while (not toVisit.empty()) and (not found):
@@ -73,7 +78,8 @@ class Service:
             for child in self.getNeighbors(mapM,node):
                 if child in visited:
                     continue
-                toVisit.put((priorityFunction(child),child))
+                distances[child[0]][child[1]] = distances[node[0]][node[1]] + 1
+                toVisit.put((priorityFunction(child,distances),child))
                 parent[child] = node
         return found, parent
 
