@@ -4,21 +4,21 @@ import pygame
 import time
 
 from Constants.Colors import Colors
-from Board.DMap import DMap
+from Board.Map import Map
 from Drone.Drone import Drone
+from Service.Service import Service
 
 
 class Gui:
-    def __init__(self,environment):
-        # we create the environment
-        self.e = environment
-        # print(str(e))
+    def __init__(self, map):
 
         # we create the map
-        self.m = DMap()
+        self.m = map
+        self.m.loadMap("test1.map")
 
         # we position the drone somewhere in the area
         self.d = Drone(randint(0, 19), randint(0, 19))
+        self.service = Service()
 
 
     def start_game(self):
@@ -35,9 +35,9 @@ class Gui:
         height = start_screen.get_height()
 
         smallfont = pygame.font.SysFont('Corbel', 35)
-        text1 = smallfont.render('0.01', True, Colors.WHITE.value)
-        text2 = smallfont.render('0.10', True, Colors.WHITE.value)
-        text3 = smallfont.render('1.00', True, Colors.WHITE.value)
+        text1 = smallfont.render('1.00', True, Colors.WHITE.value)
+        text2 = smallfont.render('2.00', True, Colors.WHITE.value)
+        text3 = smallfont.render('5.00', True, Colors.WHITE.value)
 
         button_width = (width-40)//3
         button_height = height//3
@@ -61,27 +61,28 @@ class Gui:
                     return
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if 10 <= mouse[0] <= 10+button_width and height //4 <= mouse[1] <= height//4 + button_height:
-                        self.run_game(0.01)
+                        self.run_game(1.0)
                         return
                     if 20+button_width <= mouse[0] <= 20+2*button_width and height //4 <= mouse[1] <= height//4 + button_height:
-                        self.run_game(0.1)
+                        self.run_game(2.0)
                         return
                     if 30+button_width <= mouse[0] <= 30+3*button_width and height //4 <= mouse[1] <= height//4 + button_height:
-                        self.run_game(1.0)
+                        self.run_game(5.0)
                         return
 
     def run_game(self,delay):
-        pygame.display.set_caption("drone exploration")
+        pygame.display.set_caption("Path in simple environment")
 
         # create a surface on screen that has the size of 800 x 480
-        screen = pygame.display.set_mode((800, 400))
+        screen = pygame.display.set_mode((400, 400))
         screen.fill(Colors.WHITE.value)
-        screen.blit(self.e.image(), (0, 0))
 
-        self.m.markDetectedWalls(self.e, self.d.x, self.d.y)
         # define a variable to control the main loop
         running = True
         counter = 0
+        chosenDestination = None
+        time.sleep(0.3)
+        pygame.event.clear()
         # main loop
         while running:
             # event handling, gets all event from the event queue
@@ -91,19 +92,51 @@ class Gui:
                     # change the value to False, to exit the main loop
                     running = False
                     break
+                if event.type == pygame.MOUSEBUTTONUP:
+                    pos = pygame.mouse.get_pos()
+                    chosenDestination = self.service.verify_pos(pos)
+                    if chosenDestination is None:
+                        continue
+                    running = False
+                    break
 
-            time.sleep(delay)
-            response = self.d.moveDSF(self.m)
-            if response == -1:
-                self.end_game(counter)
-                return
-            counter = counter+1
-
-            self.m.markDetectedWalls(self.e, self.d.x, self.d.y)
-            screen.blit(self.m.image(self.d.x, self.d.y), (400, 0))
+            screen.blit(self.d.mapWithDrone(self.m.image()), (0, 0))
             pygame.display.flip()
 
+        start_time = time.time()
+        path = self.service.searchGreedy(self.m, self.d.x, self.d.y, chosenDestination[0], chosenDestination[1])
+        end_time = time.time()
+        print("Greedy:",end_time-start_time)
+        screen.blit(self.displayWithPath(self.m.image(), path, Colors.GREEN.value), (0, 0))
+        pygame.display.flip()
+        time.sleep(delay)
+
+        start_time = time.time()
+        path = self.service.searchAStar(self.m, self.d.x, self.d.y, chosenDestination[0], chosenDestination[1])
+        end_time = time.time()
+        print("A*:",end_time-start_time)
+        screen.blit(self.displayWithPath(self.m.image(), path, Colors.RED.value), (0, 0))
+        pygame.display.flip()
+        time.sleep(delay)
+
+        start_time = time.time()
+        path = self.service.getSimulatedAnnealingAnswer(self.m, self.d.x, self.d.y, chosenDestination[0], chosenDestination[1])
+        end_time = time.time()
+        print("Simulated Annealing:",end_time-start_time)
+        screen.blit(self.displayWithPath(self.m.image(), path, Colors.GRAYBLUE.value), (0, 0))
+        pygame.display.flip()
+        time.sleep(delay)
+
+
         pygame.quit()
+
+    def displayWithPath(self,image, path, colour):
+        mark = pygame.Surface((20, 20))
+        mark.fill(colour)
+        for move in path:
+            image.blit(mark, (move[1] * 20, move[0] * 20))
+
+        return image
 
     def end_game(self, counter):
         time.sleep(1)

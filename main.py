@@ -1,8 +1,7 @@
-from Board.Environment import Environment
+from Board.Map import Map
 from Gui.Gui import Gui
 
 if __name__ == '__main__':
-    environment = Environment()
-    environment.loadEnvironment("test2.map")
-    g = Gui(environment)
+    map = Map()
+    g = Gui(map)
     g.start_game()
