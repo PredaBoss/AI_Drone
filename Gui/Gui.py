@@ -104,7 +104,7 @@ class Gui:
             pygame.display.flip()
 
         start_time = time.time()
-        path = self.service.searchGreedy(self.m,self.d,self.d.x,self.d.y,chosenDestination[0],chosenDestination[1])
+        path = self.service.searchGreedy(self.m, self.d.x, self.d.y, chosenDestination[0], chosenDestination[1])
         end_time = time.time()
         print("Greedy:",end_time-start_time)
         screen.blit(self.displayWithPath(self.m.image(), path, Colors.GREEN.value), (0, 0))
@@ -112,12 +112,21 @@ class Gui:
         time.sleep(delay)
 
         start_time = time.time()
-        path = self.service.searchAStar(self.m,self.d,self.d.x,self.d.y,chosenDestination[0],chosenDestination[1])
+        path = self.service.searchAStar(self.m, self.d.x, self.d.y, chosenDestination[0], chosenDestination[1])
         end_time = time.time()
         print("A*:",end_time-start_time)
         screen.blit(self.displayWithPath(self.m.image(), path, Colors.RED.value), (0, 0))
         pygame.display.flip()
         time.sleep(delay)
+
+        start_time = time.time()
+        path = self.service.getSimulatedAnnealingAnswer(self.m, self.d.x, self.d.y, chosenDestination[0], chosenDestination[1])
+        end_time = time.time()
+        print("Simulated Annealing:",end_time-start_time)
+        screen.blit(self.displayWithPath(self.m.image(), path, Colors.GRAYBLUE.value), (0, 0))
+        pygame.display.flip()
+        time.sleep(delay)
+
 
         pygame.quit()
 
