@@ -1,7 +1,7 @@
-from Board.Map import Map
-from Gui.Gui import Gui
+from Domain.Map import Map
+from View.Gui import Gui
+from View.Ui import Ui
 
 if __name__ == '__main__':
-    map = Map()
-    g = Gui(map)
-    g.start_game()
+    u = Ui()
+    u.run()
