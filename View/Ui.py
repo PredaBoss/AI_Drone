@@ -23,7 +23,6 @@ class Ui:
         self.going_back = None
         self.path = None
         self.fitness_avg = None
-        self.fitness_max = None
         self.mutation_probability = None
         self.crossover_probability = None
         self.speed = None
@@ -105,11 +104,11 @@ class Ui:
                     else:
                         self.individual_size = self.battery*2
 
-                    self.number_of_runs = input("Number of runs (enter=100)= ")
+                    self.number_of_runs = input("Number of runs (enter=10000)= ")
                     if len(self.number_of_runs) != 0:
                         self.number_of_runs = int(self.number_of_runs)
                     else:
-                        self.number_of_runs = 100
+                        self.number_of_runs = 10000
 
                     self.mutation_probability = input("Probability of mutation (enter=0.05)= ")
                     if len(self.mutation_probability) != 0:
@@ -137,11 +136,14 @@ class Ui:
                         print("Program already solved")
                         continue
                     start = time.time()
-                    self.path, self.fitness_avg, self.fitness_max, self.solution_fitness = self.controller.solver(self.population_size,self.individual_size,self.number_of_runs,self.battery,self.going_back,self.mutation_probability,self.crossover_probability)
+                    self.path, self.fitness_avg, self.solution_fitness = self.controller.solver(self.population_size,self.individual_size,self.number_of_runs,self.battery,self.going_back,self.mutation_probability,self.crossover_probability)
                     end = time.time()
                     print("Evolutionary algorithm:",end-start)
                     print("Moves:",len(self.path)-1)
-                    print("Discovered cells",self.solution_fitness)
+                    nr_cells = self.solution_fitness
+                    if self.path[0] == self.path[-1]:
+                        nr_cells = self.solution_fitness-100
+                    print("Discovered cells",nr_cells)
                     self.program_solved = True
 
                 elif algorithm_option == "3":
@@ -151,7 +153,7 @@ class Ui:
                     values = []
                     for i in range(30):
                         seed(i)
-                        _,_,_,fitness = self.controller.solver(self.population_size,self.individual_size,self.number_of_runs,self.battery,self.going_back,self.mutation_probability,self.crossover_probability)
+                        _,_,fitness = self.controller.solver(self.population_size,self.individual_size,self.number_of_runs,self.battery,self.going_back,self.mutation_probability,self.crossover_probability)
                         values.append(fitness)
                     avg = statistics.mean(values)
                     stdev = statistics.stdev(values)
@@ -166,7 +168,6 @@ class Ui:
                         print("Program was not solved yet")
                         continue
                     pyplot.plot(self.fitness_avg)
-                    pyplot.plot(self.fitness_max)
                     pyplot.savefig("fitness.png")
                     pyplot.close()
 

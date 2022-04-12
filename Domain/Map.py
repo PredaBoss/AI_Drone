@@ -1,5 +1,5 @@
 import pickle
-from random import random, randrange
+from random import random, randrange, randint
 
 import numpy as np
 import pygame
@@ -14,11 +14,11 @@ class Map():
         self.m = m
 
         if x is None or y is None:
-            x = randrange(n)
+            x = randint(0, n-1)
         self.x = x
 
         if y is None:
-            y = randrange(m)
+            y = randint(0, m-1)
         self.y = y
 
         self.surface = np.zeros((self.n, self.m))

@@ -13,9 +13,6 @@ class Repository():
     def createPopulation(self, battery, population_size, individual_size, going_back):
         self.population = Population(self.map, battery, population_size, individual_size, going_back)
 
-    def set_new_population(self, population_list):
-        self.population = Population(self.map, population = population_list)
-
     def load_random_map(self, fill_factor):
         self.map.randomMap(fill_factor)
 
