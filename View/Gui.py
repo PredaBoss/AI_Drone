@@ -36,7 +36,7 @@ class Gui:
                     running = False
         pygame.quit()
 
-    def movingDrone(self,currentMap, path, speed=1, markSeen=True):
+    def movingDrone(self,currentMap, path, speed=1,markSeen = False):
         # animation of a drone on a path
 
         screen = self.initPyGame((currentMap.n * 20, currentMap.m * 20))
@@ -44,6 +44,7 @@ class Gui:
         drona = pygame.image.load("drona.png")
         for i in range(len(path)):
             screen.blit(self.image(currentMap), (0, 0))
+
 
             if markSeen:
                 brick = pygame.Surface((20, 20))
@@ -59,6 +60,12 @@ class Gui:
                             y = y + var[1]
                             screen.blit(brick, (y * 20, x * 20))
 
+            brick = pygame.Surface((20, 20))
+            brick.fill(Colors.GREEN.value)
+            screen.blit(brick, (path[i][1] * 20, path[i][0] * 20))
+            if currentMap.surface[path[i][0]][path[i][1]] == 2:
+                print(path[i])
+
             screen.blit(drona, (path[i][1] * 20, path[i][0] * 20))
             pygame.display.flip()
             time.sleep(speed)
@@ -71,10 +78,13 @@ class Gui:
         brick = pygame.Surface((20, 20))
         brick.fill(colour)
         imagine.fill(background)
+        sensor = pygame.image.load("sensor.png")
         for i in range(currentMap.n):
             for j in range(currentMap.m):
                 if currentMap.surface[i][j] == 1:
                     imagine.blit(brick, (j * 20, i * 20))
+                elif currentMap.surface[i][j] == 2:
+                    imagine.blit(sensor, (j * 20, i * 20))
 
         return imagine
 

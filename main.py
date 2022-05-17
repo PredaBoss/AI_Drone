@@ -1,7 +1,7 @@
 from Domain.Map import Map
 from View.Gui import Gui
-from View.Ui import Ui
+from View.App import App
 
 if __name__ == '__main__':
-    u = Ui()
+    u = App()
     u.run()

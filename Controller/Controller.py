@@ -1,45 +1,59 @@
-import statistics
 from copy import deepcopy
 
-from Domain.Individual import Individual
-from Repository import *
+from Domain.Ant import Ant
+from Utils.Constants import Constants
 
 
 class Controller():
-    def __init__(self, repository):
-        self.repository = repository
+    def __init__(self, map):
+        self.map = map
+        self.ants = Constants.ants.value
+        self.alpha = Constants.alpha.value
+        self.beta = Constants.beta.value
+        self.rho = Constants.rho.value
+        self.q0 = Constants.q0.value
 
-    def iteration(self, mutation_probability, crossover_probability):
+        self.pheromone = []
+        for i in range(self.ants):
+            cost_list = []
+            for j in range(self.ants):
+                if i == j :
+                    cost_list.append([0 for _ in range(6)])
+                    continue
+                cost_list.append([1 for _ in range(6)])
+            self.pheromone.append(cost_list)
 
-        parent1, parent2 = self.repository.population.selection()
-        offspring1, offspring2 = Individual.crossover(self.repository.map, parent1, parent2,crossover_probability)
+        self.initial_pheromone = deepcopy(self.pheromone)
 
-        offspring1.mutate(mutation_probability)
-        offspring2.mutate(mutation_probability)
+    def iteration(self):
+        colony = [Ant(self.map) for _ in range(self.ants)]
 
-        offspring1.update_fitness()
-        offspring2.update_fitness()
+        found_next = [True for _ in range(self.ants)]
+        something_found = True
+        while something_found:
+            something_found = False
+            for i in range(self.ants):
+                if found_next[i]:
+                    found_next[i] = colony[i].move(self.pheromone, self.alpha, self.beta, self.q0)
+                    something_found = something_found or found_next[i]
 
-        self.repository.population.selectSurvivors(offspring1, offspring2)
+        self.update_pheromone()
 
+        for ant in colony:
+            for i in range(len(ant.path_of_sensors) - 1):
+                current_sensor = ant.path_of_sensors[i]
+                next_sensor = ant.path_of_sensors[i+1]
+                self.pheromone[current_sensor[0]][next_sensor[0]][next_sensor[1]] += 1/ (len(ant.path_of_sensors)-1)
 
-    def run(self,number_of_runs, mutation_probability, crossover_probability):
-        fitness_list_avg = []
-        best_solution = None
+        ant = colony[max([(colony[i].efficiency(), i) for i in range(self.ants)])[1]]
+        return ant
 
-        for _ in range(number_of_runs):
-            self.iteration(mutation_probability,crossover_probability)
-            fitness_list_avg.append(statistics.mean([individual.fitness for individual in self.repository.population.population]))
+    def update_pheromone(self):
 
-        for individual in self.repository.population.population:
-            if best_solution is None or best_solution.fitness < individual.fitness:
-                best_solution = deepcopy(individual)
-
-        path = best_solution.get_path()
-        return path, fitness_list_avg, best_solution.fitness
-
-
-    def solver(self, population_size, individual_size, number_of_runs, battery, going_back, mutation_probability,
-               crossover_probability):
-        self.repository.createPopulation(battery, population_size, individual_size, going_back)
-        return self.run(number_of_runs, mutation_probability, crossover_probability)
+        for i in range(self.map.nr_of_sensors):
+            for j in range(self.map.nr_of_sensors):
+                if i == j:
+                    continue
+                for energy in range(1,6):
+                    self.pheromone[i][j][energy] = (1-self.rho) * self.pheromone[i][j][energy] + \
+                                                    self.rho * self.initial_pheromone[i][j][energy]
