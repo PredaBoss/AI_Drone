@@ -64,7 +64,7 @@ class Ant:
 
         path_to_next_sensor = [(cell[0], cell[1], 0) for cell in self.map.paths[current_sensor][next_sensor[0]]]
         self.path.extend(path_to_next_sensor)
-        self.path[-1] = (self.path[-1][0],self.path[-1][0],next_sensor[1])
+        self.path[-1] = (self.path[-1][0],self.path[-1][1],next_sensor[1])
         #print(self.path)
 
 

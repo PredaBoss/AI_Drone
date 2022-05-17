@@ -36,56 +36,52 @@ class Gui:
                     running = False
         pygame.quit()
 
-    def movingDrone(self,currentMap, path, speed=1,markSeen = False):
+    def movingDrone(self,currentMap, path, speed=1,markSeen = True):
         # animation of a drone on a path
 
         screen = self.initPyGame((currentMap.n * 20, currentMap.m * 20))
+        surveilled_positions = set()
 
         drona = pygame.image.load("drona.png")
+        brick = pygame.Surface((20, 20))
+        brick.fill(Colors.GREEN.value)
         for i in range(len(path)):
-            screen.blit(self.image(currentMap), (0, 0))
+            screen.blit(self.image(currentMap, surveilled_positions, drona, path[i]), (0, 0))
 
-
-            if markSeen:
-                brick = pygame.Surface((20, 20))
-                brick.fill(Colors.GREEN.value)
-                for j in range(i + 1):
-                    for var in Directions.v.value:
-                        x = path[j][0]
-                        y = path[j][1]
-                        while ((0 <= x + var[0] < currentMap.n and
-                                0 <= y + var[1] < currentMap.m) and
-                               currentMap.surface[x + var[0]][y + var[1]] != 1):
-                            x = x + var[0]
-                            y = y + var[1]
-                            screen.blit(brick, (y * 20, x * 20))
-
-            brick = pygame.Surface((20, 20))
-            brick.fill(Colors.GREEN.value)
-            screen.blit(brick, (path[i][1] * 20, path[i][0] * 20))
-            if currentMap.surface[path[i][0]][path[i][1]] == 2:
-                print(path[i])
+            if markSeen and currentMap.surface[path[i][0]][path[i][1]] == 2:
+                energy = path[i][2]
+                for direction in Directions.v.value:
+                    pos = (path[i][0], path[i][1])
+                    for _ in range(energy):
+                        pos = (pos[0]+direction[0], pos[1]+direction[1])
+                        if pos[0]>-1 and pos[0]<20 and pos[1]>-1 and pos[1]<20 and currentMap.surface[pos[0]][pos[1]] == 1:
+                            break
+                        surveilled_positions.add(pos)
 
             screen.blit(drona, (path[i][1] * 20, path[i][0] * 20))
             pygame.display.flip()
             time.sleep(speed)
         self.closePyGame()
 
-    def image(self,currentMap, colour=Colors.BLUE.value, background=Colors.WHITE.value):
+    def image(self,currentMap, surveilled_positions, drona, path,colour=Colors.BLUE.value, background=Colors.WHITE.value, surveilled=Colors.GREEN.value):
         # creates the image of a map
 
         imagine = pygame.Surface((currentMap.n * 20, currentMap.m * 20))
         brick = pygame.Surface((20, 20))
         brick.fill(colour)
+        seen = pygame.Surface((20, 20))
+        seen.fill(surveilled)
         imagine.fill(background)
         sensor = pygame.image.load("sensor.png")
+        for surveilled_position in surveilled_positions:
+            imagine.blit(seen, (surveilled_position[1] * 20, surveilled_position[0] * 20))
         for i in range(currentMap.n):
             for j in range(currentMap.m):
                 if currentMap.surface[i][j] == 1:
                     imagine.blit(brick, (j * 20, i * 20))
                 elif currentMap.surface[i][j] == 2:
                     imagine.blit(sensor, (j * 20, i * 20))
-
+        imagine.blit(drona, (path[1] * 20, path[0] * 20))
         return imagine
 
     def just_the_drone(self,current_map, drone_position):
