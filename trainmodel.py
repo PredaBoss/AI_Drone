@@ -43,7 +43,6 @@ for epoch in range(2000):
 
         # we save it for graphics
         loss_list.append(loss.item())
-        avg_loss_list.append(loss.item() / batch_size)
 
         # we set up the gradients for the weights to zero (important in pytorch)
         optimizer_batch.zero_grad()
@@ -71,8 +70,6 @@ torch.save(ann.state_dict(), filepath)
 plt.plot(loss_list)
 plt.savefig("loss.png")
 
-plt.plot(avg_loss_list)
-plt.savefig("avg_loss.png")
 
 # visualise the parameters for the ann (aka weights and biases)
 # for name, param in ann.named_parameters():

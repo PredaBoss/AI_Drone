@@ -26,11 +26,12 @@ ann.eval()
 #     if param.requires_grad:
 #         print (name, param.data)
 
+while True:
+    x =float( input("x = "))
+    y =float( input("y = "))
 
-x =float( input("x = "))
-y =float( input("y = "))
+    tens = torch.tensor((x,y))
 
-tens = torch.tensor((x,y))
-
-print(ann(tens).tolist())
-print(math.sin(x + (y/math.pi)))
+    print("Result:",ann(tens).tolist()[0])
+    print("The actual value:",math.sin(x + (y/math.pi)))
+    print("\n")
