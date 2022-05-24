@@ -4,6 +4,7 @@ Created on Tue Apr 27 14:20:51 2021
 
 @author: tudor
 """
+import math
 
 import torch
 import torch.nn.functional as F
@@ -15,7 +16,7 @@ import myModel
 # we load the model
 
 filepath = "myNet.pt"
-ann = myModel.Net(1,10,1)
+ann = myModel.Net(2,100,1)
 
 ann.load_state_dict(torch.load(filepath))
 ann.eval()
@@ -27,5 +28,9 @@ ann.eval()
 
 
 x =float( input("x = "))
-x = torch.tensor([x])
-print(ann(x).tolist())
+y =float( input("y = "))
+
+tens = torch.tensor((x,y))
+
+print(ann(tens).tolist())
+print(math.sin(x + (y/math.pi)))
