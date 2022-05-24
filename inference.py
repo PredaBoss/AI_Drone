@@ -15,7 +15,7 @@ import myModel
 
 # we load the model
 
-filepath = "myNet.pt"
+filepath = "myNetwork.pt"
 ann = myModel.Net(2,100,1)
 
 ann.load_state_dict(torch.load(filepath))

@@ -62,7 +62,7 @@ for epoch in range(2000):
 
 
     # Specify a path
-filepath = "myNet.pt"
+filepath = "myNetwork.pt"
 
 # save the model to file
 torch.save(ann.state_dict(), filepath)
