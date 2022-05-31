@@ -6,7 +6,7 @@ from PIL import Image
 from train_model import SimpleNet
 from utils import test_transformations
 
-filePath = "models/network_78.model"
+filePath = "models/network_12.model"
 ann = SimpleNet()
 ann.load_state_dict(torch.load(filePath))
 ann.eval()

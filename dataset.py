@@ -9,12 +9,12 @@ device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 class ImageClassifierDataset(Dataset):
     def __init__(self, image_list, transformation):
         image_classes = [
-            "man" if "man" in image_list[i] else "woman" if "woman" in image_list[i] else "other" for i in range(len(image_list))
+            "men" if "men" in image_list[i] else "women" if "women" in image_list[i] else "other" for i in range(len(image_list))
         ]
         image_list = strings_to_images(image_list)
         self.images = []
         self.labels = []
-        self.class_to_label = {"man": 1, "woman": 1, "other": 0}
+        self.class_to_label = {"men": 1, "women": 1, "other": 0}
         for image, image_class in zip(image_list, image_classes):
             transformed_image = transformation(image)
             self.images.append(transformed_image)
